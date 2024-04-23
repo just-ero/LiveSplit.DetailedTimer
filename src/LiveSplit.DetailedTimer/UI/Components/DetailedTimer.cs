@@ -1,15 +1,16 @@
-﻿using LiveSplit.Model;
-using LiveSplit.Model.Comparisons;
-using LiveSplit.TimeFormatters;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
-using System.Text.RegularExpressions;
+
+using LiveSplit.Model;
+using LiveSplit.Model.Comparisons;
+using LiveSplit.TimeFormatters;
 
 namespace LiveSplit.UI.Components
 {
@@ -53,7 +54,7 @@ namespace LiveSplit.UI.Components
 
         public IDictionary<string, Action> ContextMenuControls => null;
 
-        private Regex SubsplitRegex = new Regex(@"^{(.+)}\s*(.+)$", RegexOptions.Compiled);
+        private readonly Regex SubsplitRegex = new Regex(@"^{(.+)}\s*(.+)$", RegexOptions.Compiled);
 
         public DetailedTimer(LiveSplitState state)
         {
@@ -73,7 +74,7 @@ namespace LiveSplit.UI.Components
             state.ComparisonRenamed += state_ComparisonRenamed;
         }
 
-        void state_ComparisonRenamed(object sender, EventArgs e)
+        private void state_ComparisonRenamed(object sender, EventArgs e)
         {
             var args = (RenameEventArgs)e;
             if (Settings.Comparison == args.OldName)
@@ -81,6 +82,7 @@ namespace LiveSplit.UI.Components
                 Settings.Comparison = args.NewName;
                 ((LiveSplitState)sender).Layout.HasChanged = true;
             }
+
             if (Settings.Comparison2 == args.OldName)
             {
                 Settings.Comparison2 = args.NewName;
@@ -103,6 +105,7 @@ namespace LiveSplit.UI.Components
                     ImageAnimator.Animate(icon, (s, o) => { });
                     OldImage = icon;
                 }
+
                 var drawWidth = originalDrawSize;
                 var drawHeight = originalDrawSize;
                 if (icon.Width > icon.Height)
@@ -120,15 +123,17 @@ namespace LiveSplit.UI.Components
 
                 g.DrawImage(
                     icon,
-                    7 + (originalDrawSize - drawWidth) / 2,
-                    (height - originalDrawSize) / 2.0f + (originalDrawSize - drawHeight) / 2,
+                    7 + ((originalDrawSize - drawWidth) / 2),
+                    ((height - originalDrawSize) / 2.0f) + ((originalDrawSize - drawHeight) / 2),
                     drawWidth,
                     drawHeight);
 
                 IconWidth = (int)(originalDrawSize + 7.5f);
             }
             else
+            {
                 IconWidth = 0;
+            }
 
             InternalComponent.Settings.ShowGradient = Settings.TimerShowGradient;
             InternalComponent.Settings.OverrideSplitColors = Settings.OverrideTimerColors;
@@ -159,11 +164,13 @@ namespace LiveSplit.UI.Components
                 LabelSegment.ShadowColor = state.LayoutSettings.ShadowsColor;
                 LabelSegment.OutlineColor = state.LayoutSettings.TextOutlineColor;
                 if (Comparison != "None")
+                {
                     LabelSegment.Draw(g);
+                }
 
                 LabelBest.Font = labelsFont;
                 LabelBest.X = 5 + IconWidth;
-                LabelBest.Y = height * ((100f - Settings.SegmentTimerSizeRatio / 2f) / 100f);
+                LabelBest.Y = height * ((100f - (Settings.SegmentTimerSizeRatio / 2f)) / 100f);
                 LabelBest.Width = width - SegmentTimer.ActualWidth - 5 - IconWidth;
                 LabelBest.Height = height * (Settings.SegmentTimerSizeRatio / 200f);
                 LabelBest.HorizontalAlignment = StringAlignment.Near;
@@ -173,7 +180,9 @@ namespace LiveSplit.UI.Components
                 LabelBest.ShadowColor = state.LayoutSettings.ShadowsColor;
                 LabelBest.OutlineColor = state.LayoutSettings.TextOutlineColor;
                 if (!HideComparison)
+                {
                     LabelBest.Draw(g);
+                }
 
                 var offset = Math.Max(LabelSegment.ActualWidth, HideComparison ? 0 : LabelBest.ActualWidth) + 10;
 
@@ -198,7 +207,7 @@ namespace LiveSplit.UI.Components
                 {
                     BestSegmentTime.Font = timesFont;
                     BestSegmentTime.X = offset + IconWidth;
-                    BestSegmentTime.Y = height * ((100f - Settings.SegmentTimerSizeRatio / 2f) / 100f);
+                    BestSegmentTime.Y = height * ((100f - (Settings.SegmentTimerSizeRatio / 2f)) / 100f);
                     BestSegmentTime.Width = width - SegmentTimer.ActualWidth - offset - IconWidth;
                     BestSegmentTime.Height = height * (Settings.SegmentTimerSizeRatio / 200f);
                     BestSegmentTime.HorizontalAlignment = StringAlignment.Near;
@@ -210,6 +219,7 @@ namespace LiveSplit.UI.Components
                     BestSegmentTime.IsMonospaced = true;
                     BestSegmentTime.Draw(g);
                 }
+
                 SplitName.Font = Settings.SplitNameFont;
                 SplitName.X = IconWidth + 5;
                 SplitName.Y = 0;
@@ -222,7 +232,9 @@ namespace LiveSplit.UI.Components
                 SplitName.ShadowColor = state.LayoutSettings.ShadowsColor;
                 SplitName.OutlineColor = state.LayoutSettings.TextOutlineColor;
                 if (Settings.ShowSplitName)
+                {
                     SplitName.Draw(g);
+                }
             }
         }
 
@@ -276,9 +288,13 @@ namespace LiveSplit.UI.Components
 
             var timingMethod = state.CurrentTimingMethod;
             if (Settings.TimingMethod == "Real Time")
+            {
                 timingMethod = TimingMethod.RealTime;
+            }
             else if (Settings.TimingMethod == "Game Time")
+            {
                 timingMethod = TimingMethod.GameTime;
+            }
 
             var formatter = new SegmentTimesFormatter(Settings.SegmentTimesAccuracy);
 
@@ -292,7 +308,9 @@ namespace LiveSplit.UI.Components
                 {
                     HideComparison = true;
                     if (!state.Run.Comparisons.Contains(Comparison) || Comparison == "None")
+                    {
                         Comparison = state.CurrentComparison;
+                    }
                 }
                 else if (!state.Run.Comparisons.Contains(Comparison) || Comparison == "None")
                 {
@@ -300,7 +318,9 @@ namespace LiveSplit.UI.Components
                     Comparison = Comparison2;
                 }
                 else if (Comparison == Comparison2)
+                {
                     HideComparison = true;
+                }
 
                 ComparisonName = CompositeComparisons.GetShortComparisonName(Comparison);
                 ComparisonName2 = CompositeComparisons.GetShortComparisonName(Comparison2);
@@ -308,14 +328,20 @@ namespace LiveSplit.UI.Components
                 TimeSpan? segmentTime = null;
 
                 if (Comparison == BestSegmentsComparisonGenerator.ComparisonName)
+                {
                     segmentTime = state.Run[state.CurrentSplitIndex + lastSplitOffset].BestSegmentTime[timingMethod];
+                }
                 else
                 {
                     if (state.CurrentSplitIndex == 0 || (state.CurrentSplitIndex == 1 && lastSplitOffset == -1))
+                    {
                         segmentTime = state.Run[0].Comparisons[Comparison][timingMethod];
+                    }
                     else if (state.CurrentSplitIndex > 0)
+                    {
                         segmentTime = state.Run[state.CurrentSplitIndex + lastSplitOffset].Comparisons[Comparison][timingMethod]
                             - state.Run[state.CurrentSplitIndex - 1 + lastSplitOffset].Comparisons[Comparison][timingMethod];
+                    }
                 }
 
                 LabelSegment.Text = ComparisonName + ":";
@@ -325,30 +351,45 @@ namespace LiveSplit.UI.Components
                 if (Comparison != "None")
                 {
                     if (segmentTime != null)
+                    {
                         SegmentTime.Text = formatter.Format(segmentTime);
+                    }
                     else
+                    {
                         SegmentTime.Text = TimeFormatConstants.DASH;
+                    }
                 }
 
                 if (!HideComparison)
                 {
                     TimeSpan? bestSegmentTime = null;
                     if (Comparison2 == BestSegmentsComparisonGenerator.ComparisonName)
+                    {
                         bestSegmentTime = state.Run[state.CurrentSplitIndex + lastSplitOffset].BestSegmentTime[timingMethod];
+                    }
                     else
                     {
                         if (state.CurrentSplitIndex == 0 || (state.CurrentSplitIndex == 1 && lastSplitOffset == -1))
+                        {
                             bestSegmentTime = state.Run[0].Comparisons[Comparison2][timingMethod];
+                        }
                         else if (state.CurrentSplitIndex > 0)
+                        {
                             bestSegmentTime = state.Run[state.CurrentSplitIndex + lastSplitOffset].Comparisons[Comparison2][timingMethod]
                                 - state.Run[state.CurrentSplitIndex - 1 + lastSplitOffset].Comparisons[Comparison2][timingMethod];
+                        }
                     }
 
                     if (bestSegmentTime != null)
+                    {
                         BestSegmentTime.Text = formatter.Format(bestSegmentTime);
+                    }
                     else
+                    {
                         BestSegmentTime.Text = TimeFormatConstants.DASH;
+                    }
                 }
+
                 if (state.CurrentSplitIndex >= 0)
                 {
                     string name = state.Run[state.CurrentSplitIndex + lastSplitOffset].Name;
@@ -356,18 +397,26 @@ namespace LiveSplit.UI.Components
                     bool isSubsplit = name.StartsWith("-") && state.CurrentSplitIndex + lastSplitOffset < state.Run.Count - 1;
 
                     if (isSubsplit)
+                    {
                         SplitName.Text = name.Substring(1);
+                    }
                     else
                     {
                         Match match = SubsplitRegex.Match(name);
                         if (match.Success)
+                        {
                             SplitName.Text = match.Groups[2].Value;
+                        }
                         else
+                        {
                             SplitName.Text = name;
+                        }
                     }
                 }
                 else
+                {
                     SplitName.Text = "";
+                }
             }
 
             SegmentTimer.Settings.TimingMethod = Settings.TimingMethod;
@@ -382,10 +431,15 @@ namespace LiveSplit.UI.Components
             if (Cache.HasChanged)
             {
                 if (icon == null)
+                {
                     FrameCount = 0;
+                }
                 else
+                {
                     FrameCount = icon.GetFrameCount(new FrameDimension(icon.FrameDimensionsList[0]));
+                }
             }
+
             Cache["SplitName"] = SplitName.Text;
             Cache["LabelSegment"] = LabelSegment.Text;
             Cache["LabelBest"] = LabelBest.Text;
@@ -396,9 +450,13 @@ namespace LiveSplit.UI.Components
             if (InternalComponent.BigTextLabel.Brush != null && invalidator != null)
             {
                 if (InternalComponent.BigTextLabel.Brush is LinearGradientBrush)
+                {
                     Cache["TimerColor"] = ((LinearGradientBrush)InternalComponent.BigTextLabel.Brush).LinearColors.First().ToArgb();
+                }
                 else
+                {
                     Cache["TimerColor"] = InternalComponent.BigTextLabel.ForeColor.ToArgb();
+                }
             }
 
             if (invalidator != null && (Cache.HasChanged || FrameCount > 1))
@@ -411,6 +469,9 @@ namespace LiveSplit.UI.Components
         {
         }
 
-        public int GetSettingsHashCode() => Settings.GetSettingsHashCode();
+        public int GetSettingsHashCode()
+        {
+            return Settings.GetSettingsHashCode();
+        }
     }
 }

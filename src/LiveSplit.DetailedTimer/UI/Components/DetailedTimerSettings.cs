@@ -1,11 +1,12 @@
-﻿using LiveSplit.Model;
-using LiveSplit.Model.Comparisons;
-using LiveSplit.TimeFormatters;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
+
+using LiveSplit.Model;
+using LiveSplit.Model.Comparisons;
+using LiveSplit.TimeFormatters;
 
 namespace LiveSplit.UI.Components
 {
@@ -180,64 +181,64 @@ namespace LiveSplit.UI.Components
             cmbTimingMethod.DataBindings.Add("SelectedItem", this, "TimingMethod", false, DataSourceUpdateMode.OnPropertyChanged);
         }
 
-        void cmbTimingMethod_SelectedIndexChanged(object sender, EventArgs e)
+        private void cmbTimingMethod_SelectedIndexChanged(object sender, EventArgs e)
         {
             TimingMethod = cmbTimingMethod.SelectedItem.ToString();
         }
 
-        void cmbSegmentDigitsFormat_SelectedIndexChanged(object sender, EventArgs e)
+        private void cmbSegmentDigitsFormat_SelectedIndexChanged(object sender, EventArgs e)
         {
             SegmentDigitsFormat = cmbSegmentDigitsFormat.SelectedItem.ToString();
         }
 
-        void cmbSegmentAccuracy_SelectedIndexChanged(object sender, EventArgs e)
+        private void cmbSegmentAccuracy_SelectedIndexChanged(object sender, EventArgs e)
         {
             SegmentAccuracy = cmbSegmentAccuracy.SelectedItem.ToString();
         }
 
-        void cmbDigitsFormat_SelectedIndexChanged(object sender, EventArgs e)
+        private void cmbDigitsFormat_SelectedIndexChanged(object sender, EventArgs e)
         {
             DigitsFormat = cmbDigitsFormat.SelectedItem.ToString();
         }
 
-        void cmbAccuracy_SelectedIndexChanged(object sender, EventArgs e)
+        private void cmbAccuracy_SelectedIndexChanged(object sender, EventArgs e)
         {
             Accuracy = cmbAccuracy.SelectedItem.ToString();
         }
 
-        void chkSplitName_CheckedChanged(object sender, EventArgs e)
+        private void chkSplitName_CheckedChanged(object sender, EventArgs e)
         {
             label9.Enabled = label10.Enabled = lblSplitNameFont.Enabled = btnSplitNameColor.Enabled
                 = btnSplitNameFont.Enabled = chkSplitName.Checked;
 
         }
 
-        void chkDisplayIcon_CheckedChanged(object sender, EventArgs e)
+        private void chkDisplayIcon_CheckedChanged(object sender, EventArgs e)
         {
             label7.Enabled = trkIconSize.Enabled = chkDisplayIcon.Checked;
         }
 
-        void chkOverrideTimerColors_CheckedChanged(object sender, EventArgs e)
+        private void chkOverrideTimerColors_CheckedChanged(object sender, EventArgs e)
         {
             label1.Enabled = btnTimerColor.Enabled = chkOverrideTimerColors.Checked;
         }
 
-        void chkHideComparison_CheckedChanged(object sender, EventArgs e)
+        private void chkHideComparison_CheckedChanged(object sender, EventArgs e)
         {
             cmbComparison2.Enabled = label13.Enabled = !chkHideComparison.Checked;
         }
 
-        void cmbComparison2_SelectedIndexChanged(object sender, EventArgs e)
+        private void cmbComparison2_SelectedIndexChanged(object sender, EventArgs e)
         {
             Comparison2 = cmbComparison2.SelectedItem.ToString();
         }
 
-        void cmbComparison_SelectedIndexChanged(object sender, EventArgs e)
+        private void cmbComparison_SelectedIndexChanged(object sender, EventArgs e)
         {
             Comparison = cmbComparison.SelectedItem.ToString();
         }
 
-        void cmbGradientType_SelectedIndexChanged(object sender, EventArgs e)
+        private void cmbGradientType_SelectedIndexChanged(object sender, EventArgs e)
         {
             var selectedText = cmbGradientType.SelectedItem.ToString();
             btnColor1.Visible = selectedText != "Plain" && !selectedText.Contains("Delta");
@@ -247,24 +248,30 @@ namespace LiveSplit.UI.Components
             GradientString = cmbGradientType.SelectedItem.ToString();
         }
 
-        void btnSegmentTimesHundredths_CheckedChanged(object sender, EventArgs e)
+        private void btnSegmentTimesHundredths_CheckedChanged(object sender, EventArgs e)
         {
             UpdateAccuracySegmentTimes();
         }
 
-        void btnSegmentTimesSeconds_CheckedChanged(object sender, EventArgs e)
+        private void btnSegmentTimesSeconds_CheckedChanged(object sender, EventArgs e)
         {
             UpdateAccuracySegmentTimes();
         }
 
-        void UpdateAccuracySegmentTimes()
+        private void UpdateAccuracySegmentTimes()
         {
             if (btnSegmentTimesSeconds.Checked)
+            {
                 SegmentTimesAccuracy = TimeAccuracy.Seconds;
+            }
             else if (btnSegmentTimesTenths.Checked)
+            {
                 SegmentTimesAccuracy = TimeAccuracy.Tenths;
+            }
             else
+            {
                 SegmentTimesAccuracy = TimeAccuracy.Hundredths;
+            }
         }
 
         public void SetSettings(XmlNode node)
@@ -322,18 +329,31 @@ namespace LiveSplit.UI.Components
                 SegmentDigitsFormat = "1";
                 var timerAccuracy = SettingsHelper.ParseEnum<TimeAccuracy>(element["TimerAccuracy"]);
                 if (timerAccuracy == TimeAccuracy.Hundredths)
+                {
                     Accuracy = ".23";
+                }
                 else if (timerAccuracy == TimeAccuracy.Tenths)
+                {
                     Accuracy = ".2";
+                }
                 else
+                {
                     Accuracy = "";
+                }
+
                 var segmentTimerAccuracy = SettingsHelper.ParseEnum<TimeAccuracy>(element["SegmentTimerAccuracy"]);
                 if (segmentTimerAccuracy == TimeAccuracy.Hundredths)
+                {
                     SegmentAccuracy = ".23";
+                }
                 else if (segmentTimerAccuracy == TimeAccuracy.Tenths)
+                {
                     SegmentAccuracy = ".2";
+                }
                 else
+                {
                     SegmentAccuracy = "";
+                }
             }
         }
 
@@ -388,7 +408,7 @@ namespace LiveSplit.UI.Components
             SettingsHelper.ColorButtonClick((Button)sender, this);
         }
 
-        void DetailedTimerSettings_Load(object sender, EventArgs e)
+        private void DetailedTimerSettings_Load(object sender, EventArgs e)
         {
             chkHideComparison_CheckedChanged(null, null);
             chkOverrideTimerColors_CheckedChanged(null, null);
@@ -398,12 +418,18 @@ namespace LiveSplit.UI.Components
             cmbComparison.Items.Add("Current Comparison");
             cmbComparison.Items.AddRange(CurrentState.Run.Comparisons.Where(x => x != BestSplitTimesComparisonGenerator.ComparisonName && x != NoneComparisonGenerator.ComparisonName).ToArray());
             if (!cmbComparison.Items.Contains(Comparison))
+            {
                 cmbComparison.Items.Add(Comparison);
+            }
+
             cmbComparison2.Items.Clear();
             cmbComparison2.Items.Add("Current Comparison");
             cmbComparison2.Items.AddRange(CurrentState.Run.Comparisons.Where(x => x != BestSplitTimesComparisonGenerator.ComparisonName && x != NoneComparisonGenerator.ComparisonName).ToArray());
             if (!cmbComparison2.Items.Contains(Comparison2))
+            {
                 cmbComparison2.Items.Add(Comparison2);
+            }
+
             btnSegmentTimesHundredths.Checked = SegmentTimesAccuracy == TimeAccuracy.Hundredths;
             btnSegmentTimesTenths.Checked = SegmentTimesAccuracy == TimeAccuracy.Tenths;
             btnSegmentTimesSeconds.Checked = SegmentTimesAccuracy == TimeAccuracy.Seconds;
